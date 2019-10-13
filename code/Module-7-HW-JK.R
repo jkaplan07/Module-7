@@ -15,6 +15,8 @@ lake_mead_depth  <- read_csv("data/lake_mead_depth.csv")
 lake_powell_flow <- read_csv("data/lake_powell_flow.csv")
 lees_ferry_flow  <- read_csv("data/lees_ferry_flow.csv")
 
+###########################################
+####Working on table 2 first#########
 ####Border Flow ----
  #Inspect Data
   str(border_flow) #looks at structure of the data
@@ -86,16 +88,16 @@ lees_ferry_flow  <- read_csv("data/lees_ferry_flow.csv")
       count(date) %>%
       filter(n > 1)
 
-     lake_powell_flow%>% 
+    lake_powell_flow %>% 
     union_all(lees_ferry_flow) %>%
     union_all(border_flow) %>%
+      factor(location, levels = c("Lake Powell", "Lees Ferry", "Border")) %>%
     ggplot(aes(x = date, y = flow)) +
       geom_line() +
       geom_vline (xintercept = ymd("1964-01-01"), color="red") +
      facet_grid (location ~ ., switch="x") +
       theme_bw() +
     labs(x= "Date", y="Flow (cfs)")
-     
      
      ####Lake Mead Depth ----
      #Inspect Data
