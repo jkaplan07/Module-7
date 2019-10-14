@@ -88,18 +88,24 @@ lees_ferry_flow  <- read_csv("data/lees_ferry_flow.csv")
       count(date) %>%
       filter(n > 1)
 
+   #combine all into one dataset: total_flow  
     lake_powell_flow %>% 
     union_all(lees_ferry_flow) %>%
-    union_all(border_flow) %>%
-      factor(location, levels = c("Lake Powell", "Lees Ferry", "Border")) %>%
+    union_all(border_flow) -> total_flow
+    
+   #reorder flow levels so they appear correctly in the graph
+    total_flow$location<-factor(total_flow$location, levels = c("Lake Powell", "Lees Ferry", "Border"))
+     
+  #create plot 
+   total_flow %>%   
     ggplot(aes(x = date, y = flow)) +
       geom_line() +
       geom_vline (xintercept = ymd("1964-01-01"), color="red") +
-     facet_grid (location ~ ., switch="x") +
+     facet_wrap (~ location, ncol = 1) +
       theme_bw() +
     labs(x= "Date", y="Flow (cfs)")
      
-     ####Lake Mead Depth ----
+ ####Lake Mead Depth ----
      #Inspect Data
      str(lake_mead_depth) #looks at structure of the data
      head(lake_mead_depth) #check top of data 
@@ -110,16 +116,17 @@ lees_ferry_flow  <- read_csv("data/lees_ferry_flow.csv")
      #tibble has 12 variables - 1 for each month, and 79 rows, each a year.
      
      lake_mead_depth %>%
-       mutate(canyone_depth = ifelse(year < 1960, "incomplete", "complete")) %>%
-       ggplot(x = month, y = depth by year())
-     View()
-     # if #need to create variable canyon_depth
+       mutate(canyon_complete = ifelse(year < 1960, "Pre Glen Canyon Dam (1936 - 1964)", "Post Glen Canyon Dam (1964 - 2014)")) %>% #create complete/incomplete dame variable
+       gather('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC', key = "month", value = "depth") ->lake_mead_depth #create month rows for each year
      
-     ##### Create Figure 1 ----
+    #reorder month and canyon_complete variables so they appear in the correct order
+     lake_mead_depth$month <- factor(lake_mead_depth$month, levels = c("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"))
+     lake_mead_depth$canyon_complete <- factor(lake_mead_depth$canyon_complete, levels = c("Pre Glen Canyon Dam (1936 - 1964)", "Post Glen Canyon Dam (1964 - 2014)"))
+
      lake_mead_depth %>%
-       #create new variable canyon_dam
-       #if reading was before 1964-01-01 then pre canyon dam, if after it is post canyon dam
-       ggplot 
-     geom_pointrange() +
-       theme_bw
+       ggplot(aes(x = month, y = depth)) +
+       geom_boxplot() +
+       facet_grid(. ~ canyon_complete) +
+         theme_bw() +
+       labs(x = "MONTH", y = "Lake Mead depth (ft)")
      
