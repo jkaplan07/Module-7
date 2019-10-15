@@ -112,11 +112,11 @@ lees_ferry_flow  <- read_csv("data/lees_ferry_flow.csv")
      tail(lake_mead_depth) #check bottom of data 
      dim(lake_mead_depth) #check n's
      summary(lake_mead_depth)
-     
+    
      #tibble has 12 variables - 1 for each month, and 79 rows, each a year.
      
      lake_mead_depth %>%
-       mutate(canyon_complete = ifelse(year < 1960, "Pre Glen Canyon Dam (1936 - 1964)", "Post Glen Canyon Dam (1964 - 2014)")) %>% #create complete/incomplete dame variable
+       mutate(canyon_complete = ifelse(year < 1964, "Pre Glen Canyon Dam (1936 - 1964)", "Post Glen Canyon Dam (1964 - 2014)")) %>% #create complete/incomplete dame variable
        gather('JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC', key = "month", value = "depth") ->lake_mead_depth #create month rows for each year
      
     #reorder month and canyon_complete variables so they appear in the correct order
